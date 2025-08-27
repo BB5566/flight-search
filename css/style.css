@@ -1,0 +1,167 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* 通用 box-sizing 規則，用於可預測的佈局 */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* --- 1. 主題與顏色變數 --- */
+/* 使用 CSS 變數以便於主題管理和保持一致性。 */
+:root {
+    --primary-color: #0052D4; /* 專業藍 */
+    --primary-hover: #003a9b;
+    --background-color: #f8f9fa; /* 淺灰色背景 */
+    --card-background: #ffffff;
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --border-color: #dee2e6;
+    --shadow-color: rgba(0, 0, 0, 0.05);
+    --input-height: 50px; /* 所有表單控制項的標準化高度 */
+}
+
+/* --- 2. Body 與基礎樣式 --- */
+body {
+    font-family: 'Inter', sans-serif;
+    color: var(--text-primary);
+    background-color: var(--background-color);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+}
+
+/* --- 3. 主要搜尋容器 --- */
+.search-container {
+    width: 90%;
+    max-width: 800px;
+    background: var(--card-background);
+    border-radius: 16px;
+    padding: 32px 40px;
+    box-shadow: 0 8px 40px var(--shadow-color);
+    border: 1px solid var(--border-color);
+}
+
+h1 { text-align: center; font-weight: 700; font-size: 2rem; margin-bottom: 8px; }
+.subtitle { text-align: center; color: var(--text-secondary); margin-bottom: 32px; }
+
+/* --- 4. 表單網格佈局 --- */
+/* 為主要表單欄位使用單一、穩固的網格，以確保完美對齊。 */
+.form-layout-grid {
+    display: grid;
+    /* 三欄：1fr 用於輸入框，40px 用於交換按鈕，1fr 用於輸入框 */
+    grid-template-columns: 1fr 40px 1fr;
+    gap: 16px 20px; /* 行與列的間距 */
+    align-items: end; /* 將所有項目在其單元格中底部對齊，以保持垂直一致性 */
+}
+
+/* 使元素跨越所有 3 個網格欄的工具類 */
+.grid-col-span-3 {
+    grid-column: 1 / -1;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-left: 2px;
+}
+
+/* --- 5. 表單控制項 (輸入框、選擇框、按鈕) --- */
+/* 所有表單元素的標準化樣式 */
+.form-control, .form-select, .pax-button {
+    height: var(--input-height);
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 0 14px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center; /* 文字/圖示的完美垂直對齊 */
+    -webkit-appearance: none; /* 重設瀏覽器預設樣式以保持一致性 */
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* <select> 的自訂下拉箭頭 */
+.form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236c757d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 16px 12px;
+}
+
+/* 為日期選擇器原生圖示設定樣式 */
+.form-control[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0.6;
+    cursor: pointer;
+}
+
+/* 表單控制項的 :focus 狀態 */
+.form-control:focus, .form-select:focus, .pax-button:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 82, 212, 0.15);
+    outline: none;
+}
+
+#swapBtn {
+    background: #f8f9fa;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    width: 40px;
+    height: var(--input-height);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#swapBtn:hover { background: #e9ecef; color: var(--text-primary); }
+
+/* --- 6. 回程日期的顯示/隱藏邏輯 --- */
+/* 使用 visibility/opacity 以防止隱藏元素時發生版面位移。 */
+.return-date-container {
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+    opacity: 1;
+    visibility: visible;
+}
+
+.return-date-container.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* --- 7. 切換開關 --- */
+.toggles-container { display: flex; justify-content: space-between; align-items: center; background-color: #f8f9fa; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border-color); margin-top: 20px; }
+.form-check-label, .trip-type-switch span { color: var(--text-secondary); font-weight: 500; }
+.trip-type-switch { display: flex; align-items: center; gap: 10px; }
+.switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+.switch input { display: none; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ced4da; transition: .4s; border-radius: 28px; }
+.slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: var(--primary-color); }
+input:checked + .slider:before { transform: translateX(22px); }
+
+/* --- 8. 乘客選擇彈出視窗 --- */
+.pax-button { text-align: left; }
+.popover-card { display: none; position: absolute; background: var(--card-background); border: 1px solid #e9ecef; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); padding: 16px; width: 100%; z-index: 100; margin-top: 8px; }
+.popover-row { display: flex; align-items: center; justify-content: space-between; margin: 16px 0; }
+.counter { display: flex; align-items: center; gap: 12px; }
+.counter button { background: #f1f3f5; border: 1px solid #dee2e6; color: var(--text-primary); border-radius: 50%; width: 28px; height: 28px; }
+
+/* --- 9. 主要搜尋按鈕 --- */
+.btn-primary { width: 100%; padding: 14px; font-size: 1.1rem; font-weight: 600; border-radius: 10px; background-color: var(--primary-color); border: none; color: white; transition: all 0.2s ease; margin-top: 24px; cursor: pointer; height: var(--input-height); }
+.btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 82, 212, 0.2); }
+
