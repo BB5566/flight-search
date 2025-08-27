@@ -379,7 +379,6 @@
     document.getElementById('applyPax').addEventListener('click', ()=>{ cabinHidden.value=cabinSelect.value; refreshPaxBtn(); paxCard.style.display='none'; });
     refreshPaxBtn();
 
-    // 已移除月曆價格趨勢功能
     </script>
 </body>
 </html>
