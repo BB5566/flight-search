@@ -205,3 +205,97 @@ body {
     color: var(--text-primary);
     border-color: var(--border-color);
 }
+
+/* --- 9. 響應式設計 --- */
+@media (max-width: 768px) {
+    .result-container {
+        width: 95%;
+        margin: 20px auto;
+    }
+
+    .page-header {
+        padding: 16px;
+    }
+
+    .flight-summary h2 {
+        font-size: 1.4rem;
+    }
+
+    .chip {
+        padding: 6px 10px;
+        font-size: 0.8em;
+    }
+
+    .flight-card {
+        padding: 16px;
+    }
+
+    .price {
+        font-size: 1.4rem;
+    }
+
+    .flight-time {
+        font-size: 1.2rem;
+    }
+
+    .flight-path {
+        margin: 0 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .result-container {
+        width: 100%;
+        padding: 0 10px;
+    }
+
+    .page-header {
+        border-radius: 12px;
+        margin-bottom: 20px;
+    }
+
+    .flight-summary h2 {
+        font-size: 1.2rem;
+    }
+
+    .chip-container {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .chip {
+        padding: 5px 8px;
+        font-size: 0.75em;
+    }
+
+    .filter-section {
+        padding: 12px;
+        border-radius: 12px;
+    }
+
+    .flight-card {
+        padding: 14px;
+        border-radius: 12px;
+        margin-bottom: 12px;
+    }
+
+    .price {
+        font-size: 1.2rem;
+    }
+
+    .flight-time {
+        font-size: 1rem;
+    }
+
+    .ribbon {
+        width: 100px;
+        height: 100px;
+    }
+
+    .ribbon span {
+        width: 140px;
+        font-size: 0.65rem;
+        left: -35px;
+        top: 26px;
+    }
+}

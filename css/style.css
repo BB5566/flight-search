@@ -165,3 +165,87 @@ input:checked + .slider:before { transform: translateX(22px); }
 .btn-primary { width: 100%; padding: 14px; font-size: 1.1rem; font-weight: 600; border-radius: 10px; background-color: var(--primary-color); border: none; color: white; transition: all 0.2s ease; margin-top: 24px; cursor: pointer; height: var(--input-height); }
 .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 82, 212, 0.2); }
 
+/* --- 10. Loading State --- */
+.btn-primary:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-primary .spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* --- 11. 響應式設計 --- */
+@media (max-width: 768px) {
+    .search-container {
+        width: 95%;
+        padding: 24px 20px;
+    }
+
+    h1 {
+        font-size: 1.6rem;
+    }
+
+    .form-layout-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    #swapBtn {
+        width: 100%;
+        height: 40px;
+        margin: 8px 0;
+    }
+
+    .return-date-container.hidden {
+        display: none;
+    }
+
+    .toggles-container {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+    .btn-primary {
+        margin-top: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .search-container {
+        padding: 20px 16px;
+        border-radius: 12px;
+    }
+
+    h1 {
+        font-size: 1.4rem;
+    }
+
+    .subtitle {
+        font-size: 0.9rem;
+    }
+
+    .form-control, .form-select, .pax-button {
+        height: 46px;
+        font-size: 0.95rem;
+    }
+
+    .btn-primary {
+        height: 46px;
+        font-size: 1rem;
+    }
+}
