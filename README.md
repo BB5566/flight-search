@@ -55,17 +55,24 @@ You need to get your own API credentials from the [Amadeus for Developers](https
 
 您需要先從 [Amadeus for Developers](https://developers.amadeus.com/) 網站獲取您自己的 API 金鑰。
 
-- Create a new file named `.env` in the root directory of the project.
-- 在專案的根目錄下，建立一個名為 `.env` 的新檔案。
+- Copy `.env.example` to `.env` in the project root.
+- 在專案根目錄將 `.env.example` 複製為 `.env`。
 
-- Copy the following structure into the `.env` file and replace the placeholders with your actual API keys:
-- 將以下結構複製到 `.env` 檔案中，並用您自己的 API 金鑰替換預留位置：
+```bash
+cp .env.example .env
+```
+
+- Update `.env` with your own API keys:
+- 將 `.env` 內的預設值改成您自己的 API 金鑰：
 
 ```env
-# .env
 AMADEUS_CLIENT_ID="YOUR_AMADEUS_API_KEY"
 AMADEUS_CLIENT_SECRET="YOUR_AMADEUS_API_SECRET"
+AMADEUS_ENV="test"
 ```
+
+`.env` is already ignored by `.gitignore`, so your keys will not be committed.
+`.env` 已預設加入 `.gitignore`，不會被提交到版本庫。
 
 **3. Run the Application / 運行應用程式**
 
@@ -104,7 +111,7 @@ d:\FLIGHT-SEARCH
 │   └── results.js      # 結果頁的腳本 (篩選與排序)
 ├── templates/          # 可重複使用的 PHP 模板
 │   └── flight_card.php # 單個航班資訊卡片的模板
-├── .env.example        # 環境變數範例檔案 (可自行加入)
+├── .env.example        # 環境變數範例檔案
 ├── .gitignore          # Git 忽略設定
 ├── amadeus_api.php     # Amadeus API 串接的核心類別
 ├── env.php             # 讀取 .env 環境變數的輔助腳本

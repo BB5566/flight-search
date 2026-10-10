@@ -3,10 +3,25 @@
 require_once 'amadeus_api.php'; // API 客戶端類別
 require_once 'utils.php';       // 輔助函式 (例如 getAirlineName)
 
+function normalizeIataCode(string $value): string {
+    return strtoupper(trim($value));
+}
+
+function isValidDateInput(string $value): bool {
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+        return false;
+    }
+    $date = DateTime::createFromFormat('Y-m-d', $value);
+    return $date && $date->format('Y-m-d') === $value;
+}
+
+$hasSearchRequest = ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST';
+$validationErrors = [];
+
 // --- 1. 從 POST 獲取並清理輸入 --- 
 // 從表單提交中獲取所有搜尋參數並進行清理。
-$from = strtoupper(trim($_POST['from'] ?? ''));
-$to = strtoupper(trim($_POST['to'] ?? ''));
+$from = normalizeIataCode($_POST['from'] ?? '');
+$to = normalizeIataCode($_POST['to'] ?? '');
 $date = trim($_POST['date'] ?? '');
 $tripType = ($_POST['trip_type'] ?? 'oneway') === 'round' ? 'round' : 'oneway';
 $returnDate = ($tripType === 'round') ? trim($_POST['return_date'] ?? '') : '';
@@ -17,13 +32,49 @@ $infants = max(0, (int)($_POST['infants'] ?? 0));
 $cabinClass = strtoupper(trim($_POST['cabin_class'] ?? 'ECONOMY'));
 $nonStop = !empty($_POST['non_stop']);
 
+$allowedCurrencies = ['TWD', 'USD', 'JPY', 'HKD', 'EUR'];
+$allowedCabinClasses = ['ECONOMY', 'PREMIUM_ECONOMY', 'BUSINESS', 'FIRST'];
+
+if ($hasSearchRequest) {
+    if (!$from || !$to || !$date) {
+        $validationErrors[] = '請完整填寫出發地、目的地與出發日期。';
+    }
+    if (!preg_match('/^[A-Z]{3}$/', $from) || !preg_match('/^[A-Z]{3}$/', $to)) {
+        $validationErrors[] = '出發地與目的地必須是有效的三碼機場代碼。';
+    }
+    if ($from && $to && $from === $to) {
+        $validationErrors[] = '出發地與目的地不能相同。';
+    }
+    if ($date && !isValidDateInput($date)) {
+        $validationErrors[] = '出發日期格式不正確。';
+    }
+    if ($tripType === 'round') {
+        if (!$returnDate) {
+            $validationErrors[] = '來回行程請填寫回程日期。';
+        } elseif (!isValidDateInput($returnDate)) {
+            $validationErrors[] = '回程日期格式不正確。';
+        } elseif (isValidDateInput($date) && $returnDate < $date) {
+            $validationErrors[] = '回程日期不可早於出發日期。';
+        }
+    }
+    if (!in_array($currency, $allowedCurrencies, true)) {
+        $validationErrors[] = '幣別設定不正確，請重新搜尋。';
+    }
+    if (!in_array($cabinClass, $allowedCabinClasses, true)) {
+        $validationErrors[] = '艙等設定不正確，請重新搜尋。';
+    }
+    if ($adults > 9 || $children > 9 || $infants > 9 || $infants > $adults) {
+        $validationErrors[] = '旅客人數設定不正確，請重新調整。';
+    }
+}
+
 // --- 2. 從 API 獲取航班資料 --- 
 $outboundResult = [];
 $returnResult = [];
 $apiError = null;
 
 // 僅在擁有最基本的必要參數時才繼續。
-if ($from && $to && $date) {
+if ($hasSearchRequest && empty($validationErrors)) {
     $api = new AmadeusApi(true); // 實例化 API 客戶端 (true = 開啟除錯模式)
 
     // 準備用於 API 呼叫的參數陣列。
@@ -151,12 +202,23 @@ sort($availableAirlines);
                 <?php if (count($returnFlights) > 10): ?><div class="text-center mt-2"><button class="btn btn-outline-secondary" id="moreReturn">顯示更多</button></div><?php endif; ?>
             <?php endif; ?>
 
+        <?php elseif (!empty($validationErrors)): ?>
+            <div class="alert alert-warning mt-4">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i><b>輸入資料有誤</b>
+                <ul class="mb-0 mt-2">
+                    <?php foreach ($validationErrors as $msg): ?>
+                        <li><?= htmlspecialchars($msg) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
         <?php elseif ($apiError): ?>
             <!-- 顯示 API 錯誤訊息 -->
             <div class="alert alert-warning mt-4"><i class="bi bi-exclamation-triangle-fill me-2"></i><b>查詢失敗</b><br><?= htmlspecialchars($apiError['error'] ?? '發生未知錯誤') ?></div>
-        <?php else: ?>
+        <?php elseif ($hasSearchRequest): ?>
             <!-- 顯示找不到航班的訊息 -->
             <div class="alert alert-info mt-4"><i class="bi bi-info-circle-fill me-2"></i>找不到符合條件的航班。請嘗試放寬您的搜尋條件。</div>
+        <?php else: ?>
+            <div class="alert alert-info mt-4"><i class="bi bi-info-circle-fill me-2"></i>請先回到上一頁輸入搜尋條件。</div>
         <?php endif; ?>
 
     </div>

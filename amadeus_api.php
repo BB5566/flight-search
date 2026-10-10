@@ -2,9 +2,6 @@
 require_once 'env.php';
 loadEnv();
 
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
 /**
  * AmadeusApi 類別
  *
@@ -55,7 +52,7 @@ class AmadeusApi {
     private function handleApiError(array $response, int $httpCode): array {
         $error = $response['errors'][0] ?? [];
         $errorCode = $error['code'] ?? 'SYSTEM_ERROR';
-        $errorDetail = $error['detail'] ?? '發生未知錯誤。';
+        $errorDetail = $error['detail'] ?? '服務暫時無法使用，請稍後再試。';
 
         $this->log(['error_code' => $errorCode, 'http_code' => $httpCode, 'detail' => $errorDetail]);
 
@@ -91,10 +88,13 @@ class AmadeusApi {
                 $this->log("重試請求 #" . ($retry + 1));
                 return $this->makeRequest($url, $headers, $method, $body, $retry + 1);
             }
-            return ['error' => 'API 連接失敗', 'http_code' => 0];
+            return ['error' => '目前無法連線到航班服務，請稍後再試。', 'http_code' => 0];
         }
 
         $decoded = json_decode($response, true);
+        if (!is_array($decoded) && $response !== '' && $response !== false) {
+            $decoded = ['errors' => [['detail' => '服務回應格式異常，請稍後再試。']]];
+        }
         if ($httpCode >= 400) {
             return $this->handleApiError($decoded ?: ['errors' => [['detail' => $response]]], $httpCode);
         }
@@ -166,8 +166,12 @@ class AmadeusApi {
      * @return array API 回應的關聯陣列。
      */
     public function searchFlights(array $params): array {
+        if (empty($this->clientId) || empty($this->clientSecret)) {
+            return ['error' => '系統尚未完成 API 設定，請通知管理員設定 Amadeus 金鑰。'];
+        }
+
         if (!$this->getAccessToken()) {
-            return ['error' => '無法獲取 API access token。'];
+            return ['error' => '無法完成航班服務驗證，請稍後再試。'];
         }
 
         $queryParams = http_build_query($params);
