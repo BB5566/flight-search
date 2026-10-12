@@ -18,12 +18,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const airline = airlineFilter?.value || '';
         const sort = sortMode?.value || 'price-asc';
         const stops = stopsFilter?.value || '';
+        const isFiltering = airline !== '' || stops !== '';
 
         // 分別處理去程和回程的航班列表
-        const flightLists = [outboundList, returnList].filter(Boolean);
+        const listConfigs = [
+            { container: outboundList, moreBtn: moreOutboundBtn },
+            { container: returnList, moreBtn: moreReturnBtn }
+        ].filter(cfg => cfg.container);
 
-        flightLists.forEach(listContainer => {
-            const flights = Array.from(listContainer.getElementsByClassName('flight-card'));
+        listConfigs.forEach(({ container, moreBtn }) => {
+            const flights = Array.from(container.getElementsByClassName('flight-card'));
+            let visibleCount = 0;
 
             // 步驟 1: 篩選 (根據航空公司和轉機次數)
             flights.forEach(flight => {
@@ -38,19 +43,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     show = false;
                 }
 
-                flight.style.display = show ? 'block' : 'none';
+                if (show) {
+                    // 若處於主動篩選狀態，確保移除 d-none 讓符合條件的航班皆可見
+                    if (isFiltering) {
+                        flight.classList.remove('d-none');
+                    }
+
+                    // 如果未篩選且該卡片仍屬於分頁隱藏項目，保持隱藏
+                    if (!isFiltering && flight.classList.contains('d-none')) {
+                        flight.style.display = 'none';
+                    } else {
+                        flight.style.display = 'block';
+                        visibleCount++;
+                    }
+                } else {
+                    flight.style.display = 'none';
+                }
             });
 
-            // 步驟 2: 排序 (僅排序可見的航班)
-            const visibleFlights = flights.filter(f => f.style.display !== 'none');
-
+            // 步驟 2: 排序所有航班以保持 DOM 順序穩定
             const keyOf = (el) => {
                 if (sort.startsWith('price')) return parseFloat(el.dataset.price || '0');
                 if (sort.startsWith('duration')) return parseInt(el.dataset.duration || '0', 10);
                 return 0;
             };
 
-            visibleFlights.sort((a, b) => {
+            flights.sort((a, b) => {
                 const aKey = keyOf(a);
                 const bKey = keyOf(b);
                 const isDesc = sort.endsWith('desc');
@@ -58,7 +76,31 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             // 步驟 3: 將排序後的元素重新附加到 DOM 中
-            visibleFlights.forEach(el => listContainer.appendChild(el));
+            flights.forEach(el => container.appendChild(el));
+
+            // 步驟 4: 處理查無篩選結果提示
+            let noMatchEl = container.querySelector('.no-filter-match');
+            if (visibleCount === 0 && flights.length > 0) {
+                if (!noMatchEl) {
+                    noMatchEl = document.createElement('div');
+                    noMatchEl.className = 'no-filter-match';
+                    noMatchEl.innerHTML = '<i class="bi bi-funnel me-2" aria-hidden="true"></i>查無符合篩選條件的航班，請嘗試放寬篩選條件。';
+                    container.appendChild(noMatchEl);
+                }
+                noMatchEl.style.display = 'block';
+            } else if (noMatchEl) {
+                noMatchEl.style.display = 'none';
+            }
+
+            // 步驟 5: 控制「顯示更多」按鈕顯示狀態
+            if (moreBtn) {
+                if (isFiltering) {
+                    moreBtn.style.display = 'none';
+                } else {
+                    const hasHidden = container.querySelectorAll('.more-item.d-none').length > 0;
+                    moreBtn.style.display = hasHidden ? 'inline-block' : 'none';
+                }
+            }
         });
     }
 
@@ -75,11 +117,14 @@ document.addEventListener('DOMContentLoaded', () => {
             // 顯示接下來的 10 個隱藏項目
             const hiddenItems = list.querySelectorAll('.more-item.d-none');
             hiddenItems.forEach((el, i) => {
-                if (i < 10) el.classList.remove('d-none');
+                if (i < 10) {
+                    el.classList.remove('d-none');
+                    el.style.display = 'block';
+                }
             });
-            // 如果沒有更多隱藏項目，則移除按鈕
+            // 如果沒有更多隱藏項目，則隱藏按鈕
             if (list.querySelectorAll('.more-item.d-none').length === 0) {
-                button.remove();
+                button.style.display = 'none';
             }
         });
     }

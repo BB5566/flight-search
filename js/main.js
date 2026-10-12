@@ -81,6 +81,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const cabinSelect = get('cabinSelect');
     const cabinHidden = get('cabin_class');
 
+    const updateCounterButtons = () => {
+        const adults = Number(paxInputs.adults.value);
+        const children = Number(paxInputs.children.value);
+        const infants = Number(paxInputs.infants.value);
+
+        document.querySelectorAll('[data-counter]').forEach(btn => {
+            const key = btn.dataset.counter;
+            const delta = Number(btn.dataset.delta);
+            if (key === 'adults') {
+                btn.disabled = (delta === -1 && adults <= 1) || (delta === 1 && adults >= 9);
+            } else if (key === 'children') {
+                btn.disabled = (delta === -1 && children <= 0) || (delta === 1 && children >= 9);
+            } else if (key === 'infants') {
+                btn.disabled = (delta === -1 && infants <= 0) || (delta === 1 && (infants >= adults || infants >= 9));
+            }
+        });
+    };
+
     /**
      * 根據選擇更新主要的乘客按鈕文字。
      */
@@ -91,18 +109,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const cabin = cabinSelect.options[cabinSelect.selectedIndex].text;
         let totalTravelers = Number(adults) + Number(children);
         
-        let buttonText = `<i class="bi bi-people"></i> ${totalTravelers} 位旅客, ${cabin}`;
+        let buttonText = `<i class="bi bi-people" aria-hidden="true"></i> ${totalTravelers} 位旅客, ${cabin}`;
         // 如果有嬰兒，選擇性地加上嬰兒數量。
         if (Number(infants) > 0) {
              buttonText += ` (+${infants} 嬰兒)`;
         }
         openPaxBtn.innerHTML = buttonText;
+        updateCounterButtons();
+    };
+
+    const togglePaxPopover = (open) => {
+        const isOpen = open !== undefined ? open : paxPopover.style.display !== 'block';
+        paxPopover.style.display = isOpen ? 'block' : 'none';
+        openPaxBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
     };
 
     // 顯示/隱藏彈出視窗。
     openPaxBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // 防止全域點擊監聽器立即觸發。
-        paxPopover.style.display = paxPopover.style.display === 'block' ? 'none' : 'block';
+        e.stopPropagation();
+        togglePaxPopover();
     });
     
     // 處理乘客數量的 + 和 - 按鈕。
@@ -112,8 +137,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const delta = Number(btn.dataset.delta);
             let value = Number(paxInputs[key].value) + delta;
             
-            if (key === 'adults') value = Math.max(1, value); // 成人最少為 1。
-            else value = Math.max(0, value); // 兒童/嬰兒可為 0。
+            if (key === 'adults') {
+                value = Math.min(9, Math.max(1, value));
+                // 嬰兒不能多於成人
+                if (Number(paxInputs.infants.value) > value) {
+                    paxInputs.infants.value = value;
+                    paxVals.infants.textContent = value;
+                }
+            } else if (key === 'children') {
+                value = Math.min(9, Math.max(0, value));
+            } else if (key === 'infants') {
+                const maxInfants = Math.min(9, Number(paxInputs.adults.value));
+                value = Math.min(maxInfants, Math.max(0, value));
+            }
             
             paxInputs[key].value = value;
             paxVals[key].textContent = value;
@@ -127,11 +163,17 @@ document.addEventListener('DOMContentLoaded', () => {
         refreshPaxBtn();
     });
 
-    // --- 5. 全域點擊以關閉彈出視窗 ---
-    // 如果在頁面其他任何地方發生點擊，則關閉彈出視窗。
+    // --- 5. 全域點擊與鍵盤 Esc 關閉彈出視窗 ---
     document.addEventListener('click', (e) => {
         if (!paxPopover.contains(e.target) && e.target !== openPaxBtn) {
-            paxPopover.style.display = 'none';
+            togglePaxPopover(false);
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && paxPopover.style.display === 'block') {
+            togglePaxPopover(false);
+            openPaxBtn.focus();
         }
     });
 
@@ -140,14 +182,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // 對於出發地/目的地的自訂驗證。
         if (fromCode.value === toCode.value) {
             alert('出發地與目的地不能相同');
-            e.preventDefault(); // 停止表單提交。
+            e.preventDefault();
             return;
         }
 
         // 使用內建的 HTML5 驗證來處理必填欄位，如日期。
         if (!searchForm.checkValidity()) {
             e.preventDefault();
-            searchForm.reportValidity(); // 顯示瀏覽器的驗證訊息。
+            searchForm.reportValidity();
             return;
         }
 
@@ -158,8 +200,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- 7. 初始設定 ---
-    // 將日期選擇器的最小可選日期設為今天。
-    const today = new Date().toISOString().split('T')[0];
-    departDate.min = today;
-    returnDate.min = today;
+    // 使用本地時間而非 UTC 計算今日日期，避免時區偏差
+    const formatLocalDate = (d) => {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+    const todayStr = formatLocalDate(new Date());
+    departDate.min = todayStr;
+    returnDate.min = todayStr;
+
+    // 當出發日期變更時，自動聯動回程日期的最小值
+    departDate.addEventListener('change', () => {
+        if (departDate.value) {
+            returnDate.min = departDate.value;
+            if (returnDate.value && returnDate.value < departDate.value) {
+                returnDate.value = departDate.value;
+            }
+        } else {
+            returnDate.min = todayStr;
+        }
+    });
+
+    updateCounterButtons();
 });
