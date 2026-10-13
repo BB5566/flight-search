@@ -1,301 +1,560 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* --- 1. 主題與顏色變數 (與 style.css 保持一致) --- */
+/* --- 1. 主題與顏色變數 (與 style.css 保持完全一致) --- */
 :root {
-    --primary-color: #0052D4;
-    --background-color: #f8f9fa;
+    --primary-color: #0052d4;
+    --primary-hover: #003ea1;
+    --primary-active: #002f7a;
+    --primary-subtle: #edf4fe;
+    --background-color: #f8fafc;
     --card-background: #ffffff;
-    --text-primary: #212529;
-    --text-secondary: #6c757d;
-    --border-color: #dee2e6;
-    --shadow-color: rgba(0, 0, 0, 0.05);
+    --text-primary: #0f172a;
+    --text-secondary: #475569; /* WCAG AA 達標 */
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --border-hover: #cbd5e1;
+    --border-focus: #0052d4;
+    --shadow-color: rgba(15, 23, 42, 0.05);
+    --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+    --shadow-md: 0 4px 16px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -2px rgba(15, 23, 42, 0.04);
+    --shadow-lg: 0 12px 32px -4px rgba(15, 23, 42, 0.1), 0 4px 12px -2px rgba(15, 23, 42, 0.05);
+    --focus-ring: 0 0 0 3px rgba(0, 82, 212, 0.2);
+    --radius-sm: 8px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-full: 9999px;
+    --transition: all 0.2s ease;
 }
 
 /* --- 2. Body 與基礎樣式 --- */
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
     color: var(--text-primary);
     background-color: var(--background-color);
+    line-height: 1.5;
     min-height: 100vh;
 }
 
 /* --- 3. 主要結果容器 --- */
 .result-container {
-    width: 90%;
-    max-width: 900px;
-    margin: 40px auto;
+    width: 92%;
+    max-width: 920px;
+    margin: 36px auto;
 }
 
 /* --- 4. 頁首與搜尋摘要 --- */
 .page-header {
-    padding: 24px;
+    padding: 24px 28px;
     background: var(--card-background);
     border: 1px solid var(--border-color);
-    border-radius: 16px;
-    margin-bottom: 32px;
-    box-shadow: 0 8px 40px var(--shadow-color);
+    border-radius: var(--radius-lg);
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-sm);
 }
 
 .back-link {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     color: var(--text-secondary);
     text-decoration: none;
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 0.95rem;
     margin-bottom: 16px;
-    transition: color 0.2s ease;
+    padding: 6px 14px;
+    background: #f1f5f9;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    transition: var(--transition);
 }
 
 .back-link:hover {
     color: var(--primary-color);
+    background: #e2e8f0;
+    border-color: var(--border-hover);
+    text-decoration: none;
+    transform: translateX(-2px);
+}
+
+.back-link:focus-visible {
+    box-shadow: var(--focus-ring);
+    outline: none;
 }
 
 .flight-summary h2 {
-    font-weight: 600;
+    font-weight: 700;
     font-size: 1.75rem;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+    margin-bottom: 10px;
 }
 
 .chip-container {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin-top: 12px;
 }
 
 .chip {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    background: #e9ecef;
+    gap: 6px;
+    background: #f1f5f9;
     color: var(--text-secondary);
-    padding: 8px 12px;
-    border-radius: 999px;
-    font-size: .9em;
+    border: 1px solid var(--border-color);
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
     font-weight: 500;
+}
+
+.chip i {
+    color: var(--primary-color);
 }
 
 /* --- 5. 篩選器區塊 --- */
 .filter-section {
-    padding: 20px;
+    padding: 18px 24px;
     background: var(--card-background);
     border: 1px solid var(--border-color);
-    border-radius: 16px;
-    margin-bottom: 32px;
+    border-radius: var(--radius-lg);
+    margin-bottom: 28px;
+    box-shadow: var(--shadow-sm);
 }
 
 .form-select {
-    background-color: #fff;
+    height: 44px;
+    min-height: 44px;
+    background-color: #ffffff;
     border-color: var(--border-color);
     color: var(--text-primary);
-    border-radius: 10px;
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    transition: var(--transition);
 }
-.form-select:focus {
-    box-shadow: 0 0 0 3px rgba(0, 82, 212, 0.15);
-    border-color: var(--primary-color);
+
+.form-select:hover {
+    border-color: var(--border-hover);
+}
+
+.form-select:focus, .form-select:focus-visible {
+    box-shadow: var(--focus-ring);
+    border-color: var(--border-focus);
+    outline: none;
+}
+
+/* 列表區塊標題（修復原始碼中使用 text-light 導致淺色背景下看不見文字的問題） */
+.section-title {
+    color: var(--text-primary) !important;
+    font-weight: 700;
+    font-size: 1.35rem;
+    display: flex;
+    align-items: center;
+    letter-spacing: -0.01em;
+}
+
+.text-light {
+    color: var(--text-primary) !important;
+}
+
+.route-return-icon {
+    display: inline-block;
+    transform: rotate(180deg);
 }
 
 /* --- 6. 航班卡片樣式 --- */
 .flight-card {
     border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 20px;
+    border-radius: var(--radius-lg);
+    padding: 22px 28px;
+    margin-bottom: 16px;
     background: var(--card-background);
-    box-shadow: 0 4px 25px var(--shadow-color);
-    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
     position: relative;
     overflow: hidden;
 }
 
 .flight-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-hover);
+}
+
+.flight-card:focus-within {
     border-color: var(--primary-color);
 }
 
+/* 卡片頂部預留左側邊距，避免 Ribbon 遮擋航空公司資訊 */
+.card-top-row {
+    padding-left: 20px;
+}
+
+.airline-info {
+    display: flex;
+    align-items: center;
+}
+
 .airline-logo {
-    width: 24px;
-    height: 24px;
-    margin-right: 12px;
-    border-radius: 50%;
+    height: 26px;
+    width: auto;
+    max-width: 60px;
+    object-fit: contain;
+    margin-right: 8px;
+    border-radius: 4px;
+}
+
+.airline-name {
+    color: var(--text-primary);
+    font-size: 1rem;
 }
 
 .price {
-    font-size: 1.75rem;
+    font-size: 1.65rem;
     color: var(--primary-color);
     font-weight: 700;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+}
+
+.price-symbol {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-right: 2px;
+}
+
+/* 卡片航線詳細資訊列 */
+.flight-details-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.flight-point {
+    min-width: 68px;
 }
 
 .flight-time {
-    font-size: 1.5rem;
-    font-weight: 600;
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
 }
 
 .flight-airport-code {
-    font-size: 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
     color: var(--text-secondary);
 }
 
 .flight-path {
     flex: 1;
-    margin: 0 24px;
+    max-width: 260px;
+    margin: 0 16px;
     position: relative;
     text-align: center;
-}
-
-.flight-path .line {
-    height: 1px;
-    background-color: var(--border-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .flight-duration {
     color: var(--text-secondary);
-    font-size: 0.9em;
-    margin-top: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.flight-path-line {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.line-segment {
+    flex: 1;
+    height: 2px;
+    background-color: var(--border-color);
+    border-radius: 1px;
+}
+
+.flight-plane-icon {
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    transform: rotate(90deg);
+    display: inline-block;
+}
+
+.flight-meta {
+    min-width: 80px;
 }
 
 .badge-stop {
-    background: #e9ecef;
+    background: #f1f5f9;
     color: var(--text-secondary);
-    font-weight: 500;
-    border-radius: 6px;
-    padding: 4px 8px;
+    font-weight: 600;
+    border-radius: var(--radius-full);
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    border: 1px solid var(--border-color);
+    white-space: nowrap;
+}
+
+.badge-stop.badge-direct {
+    background: #ecfdf5;
+    color: #065f46;
+    border-color: #a7f3d0;
 }
 
 /* --- 7. 左上角標籤 (Ribbon) --- */
 .ribbon {
     position: absolute;
-    top: -10px;
-    left: -10px;
-    width: 120px;
-    height: 120px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    top: 0;
+    left: 0;
+    width: 85px;
+    height: 85px;
     overflow: hidden;
-    z-index: 1;
+    pointer-events: none;
+    z-index: 2;
 }
+
 .ribbon span {
     position: absolute;
-    width: 170px;
-    text-align: center;
-    transform: rotate(-45deg);
-    background: var(--primary-color);
-    color: white;
+    display: block;
+    width: 125px;
     padding: 4px 0;
-    font-weight: 600;
-    font-size: 0.75rem;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    left: -45px;
-    top: 32px;
+    background-color: var(--primary-color);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-align: center;
+    left: -32px;
+    top: 18px;
+    transform: rotate(-45deg);
+    letter-spacing: 0.04em;
 }
-.ribbon.fast span { background: #007bff; } /* "最快" 使用不同的藍色 */
 
-/* --- 8. 其他組件 --- */
+.ribbon.fast span, .ribbon-fast span {
+    background-color: #0284c7; /* "最快" 使用亮藍色標籤 */
+}
+
+/* --- 8. 按鈕與提示元件 --- */
 .alert {
-    border-radius: 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
 }
 
-.btn-outline-secondary {
+.alert-warning {
+    background-color: #fffbeb;
+    border-color: #fde68a;
+    color: #92400e;
+}
+
+.alert-danger {
+    background-color: #fef2f2;
+    border-color: #fecaca;
+    color: #991b1b;
+}
+
+.alert-info {
+    background-color: #eff6ff;
+    border-color: #bfdbfe;
+    color: #1e40af;
+}
+
+.show-more-btn, .btn-outline-secondary {
     color: var(--text-secondary);
     border-color: var(--border-color);
-    background: #fff;
+    background: #ffffff;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    padding: 10px 24px;
+    min-height: 44px;
+    transition: var(--transition);
 }
-.btn-outline-secondary:hover {
-    background: #f8f9fa;
-    color: var(--text-primary);
-    border-color: var(--border-color);
+
+.show-more-btn:hover, .btn-outline-secondary:hover {
+    background: var(--primary-color);
+    color: #ffffff;
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(0, 82, 212, 0.2);
+}
+
+.show-more-btn:active, .btn-outline-secondary:active {
+    transform: scale(0.98);
+}
+
+.show-more-btn:focus-visible, .btn-outline-secondary:focus-visible {
+    box-shadow: var(--focus-ring);
+    outline: none;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+
+.btn-primary:focus-visible {
+    box-shadow: var(--focus-ring);
+    outline: none;
+}
+
+/* 查無符合條件的篩選提示 */
+.no-filter-match {
+    text-align: center;
+    padding: 32px 20px;
+    background: var(--card-background);
+    border-radius: var(--radius-md);
+    border: 1px dashed var(--border-color);
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-bottom: 20px;
 }
 
 /* --- 9. 響應式設計 --- */
 @media (max-width: 768px) {
     .result-container {
-        width: 95%;
+        width: 100%;
+        padding: 0 16px;
         margin: 20px auto;
     }
 
     .page-header {
-        padding: 16px;
+        padding: 18px 20px;
+        margin-bottom: 20px;
     }
 
     .flight-summary h2 {
-        font-size: 1.4rem;
+        font-size: 1.45rem;
     }
 
     .chip {
-        padding: 6px 10px;
-        font-size: 0.8em;
+        padding: 5px 12px;
+        font-size: 0.825rem;
+    }
+
+    .filter-section {
+        padding: 16px;
+        margin-bottom: 24px;
     }
 
     .flight-card {
-        padding: 16px;
-    }
-
-    .price {
-        font-size: 1.4rem;
-    }
-
-    .flight-time {
-        font-size: 1.2rem;
+        padding: 18px 20px;
     }
 
     .flight-path {
-        margin: 0 12px;
+        margin: 0 10px;
     }
 }
 
 @media (max-width: 480px) {
     .result-container {
-        width: 100%;
-        padding: 0 10px;
+        padding: 0 12px;
+        margin: 14px auto;
     }
 
     .page-header {
-        border-radius: 12px;
-        margin-bottom: 20px;
+        padding: 16px;
+        border-radius: var(--radius-md);
+        margin-bottom: 16px;
     }
 
     .flight-summary h2 {
-        font-size: 1.2rem;
+        font-size: 1.25rem;
     }
 
     .chip-container {
-        flex-wrap: wrap;
         gap: 6px;
     }
 
     .chip {
-        padding: 5px 8px;
-        font-size: 0.75em;
+        padding: 4px 10px;
+        font-size: 0.78rem;
     }
 
     .filter-section {
-        padding: 12px;
-        border-radius: 12px;
+        padding: 14px;
+        border-radius: var(--radius-md);
+        margin-bottom: 20px;
+    }
+
+    /* 防止 iOS 鍵盤觸發頁面自動放大 (保持 >= 16px) */
+    .form-select {
+        height: 44px;
+        font-size: 16px;
     }
 
     .flight-card {
-        padding: 14px;
-        border-radius: 12px;
+        padding: 16px 14px;
+        border-radius: var(--radius-md);
         margin-bottom: 12px;
     }
 
+    .card-top-row {
+        padding-left: 20px;
+        margin-bottom: 12px !important;
+    }
+
+    .airline-name {
+        font-size: 0.95rem;
+    }
+
     .price {
-        font-size: 1.2rem;
+        font-size: 1.35rem;
+    }
+
+    .price-symbol {
+        font-size: 0.95rem;
     }
 
     .flight-time {
-        font-size: 1rem;
+        font-size: 1.2rem;
+    }
+
+    .flight-airport-code {
+        font-size: 0.85rem;
+    }
+
+    .flight-path {
+        margin: 0 6px;
+        max-width: 140px;
+    }
+
+    .flight-duration {
+        font-size: 0.75rem;
+    }
+
+    .flight-meta {
+        min-width: auto;
+    }
+
+    .badge-stop {
+        padding: 3px 8px;
+        font-size: 0.72rem;
     }
 
     .ribbon {
-        width: 100px;
-        height: 100px;
+        width: 75px;
+        height: 75px;
     }
 
     .ribbon span {
-        width: 140px;
+        width: 110px;
         font-size: 0.65rem;
-        left: -35px;
-        top: 26px;
+        left: -28px;
+        top: 15px;
     }
 }

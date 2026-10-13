@@ -154,72 +154,120 @@ sort($availableAirlines);
 <body>
     <div class="result-container">
         <!-- 包含搜尋摘要的頁首 -->
-        <div class="page-header">
-            <a href="index.php" class="back-link"><i class="bi bi-arrow-left"></i> 新的搜尋</a>
+        <header class="page-header">
+            <a href="index.php" class="back-link"><i class="bi bi-arrow-left" aria-hidden="true"></i> 新的搜尋</a>
             <div class="flight-summary">
-                <h2><?= htmlspecialchars($from) ?> <i class="bi bi-arrow-right"></i> <?= htmlspecialchars($to) ?></h2>
+                <h2><?= htmlspecialchars($from) ?> <i class="bi bi-arrow-right" aria-hidden="true"></i> <?= htmlspecialchars($to) ?></h2>
                 <div class="chip-container">
-                    <span class="chip"><i class="bi bi-calendar3"></i> <?= htmlspecialchars($date) ?><?= $returnDate ? ' - ' . htmlspecialchars($returnDate) : '' ?></span>
-                    <span class="chip"><i class="bi bi-people"></i> <?= $adults + $children + $infants ?> 位旅客</span>
-                    <span class="chip"><i class="bi bi-briefcase"></i> <?= htmlspecialchars($cabinClass) ?></span>
-                    <?php if ($nonStop): ?><span class="chip"><i class="bi bi-lightning-charge-fill"></i> 僅直飛</span><?php endif; ?>
+                    <span class="chip"><i class="bi bi-calendar3" aria-hidden="true"></i> <?= htmlspecialchars($date) ?><?= $returnDate ? ' - ' . htmlspecialchars($returnDate) : '' ?></span>
+                    <span class="chip"><i class="bi bi-people" aria-hidden="true"></i> <?= $adults + $children + $infants ?> 位旅客</span>
+                    <span class="chip"><i class="bi bi-briefcase" aria-hidden="true"></i> <?= htmlspecialchars($cabinClass) ?></span>
+                    <?php if ($nonStop): ?><span class="chip"><i class="bi bi-lightning-charge-fill" aria-hidden="true"></i> 僅直飛</span><?php endif; ?>
                 </div>
             </div>
-        </div>
+        </header>
 
+        <main class="result-main">
         <?php if (!empty($outboundFlights)): ?>
             <!-- 客戶端篩選器控制項 -->
-            <div class="filter-section">
-                <div class="row g-2 align-items-center">
-                    <div class="col-md-4"><select class="form-select" id="airlineFilter"><option value="">所有航空公司</option><?php foreach ($availableAirlines as $code) echo "<option value=\"".htmlspecialchars($code)."\">".htmlspecialchars(getAirlineName($code))."</option>"; ?></select></div>
-                    <div class="col-md-4"><select class="form-select" id="sortMode"><option value="price-asc">價格 (低至高)</option><option value="price-desc">價格 (高至低)</option><option value="duration-asc">時長 (短至長)</option></select></div>
-                    <div class="col-md-4"><select class="form-select" id="stopsFilter"><option value="">任何轉機次數</option><option value="0">僅直飛</option><option value="1">最多 1 次轉機</option></select></div>
+            <section class="filter-section" aria-label="航班篩選與排序">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-4">
+                        <select class="form-select" id="airlineFilter" aria-label="依航空公司篩選">
+                            <option value="">所有航空公司</option>
+                            <?php foreach ($availableAirlines as $code) echo "<option value=\"".htmlspecialchars($code)."\">".htmlspecialchars(getAirlineName($code))."</option>"; ?>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="sortMode" aria-label="航班排序方式">
+                            <option value="price-asc">價格 (低至高)</option>
+                            <option value="price-desc">價格 (高至低)</option>
+                            <option value="duration-asc">時長 (短至長)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="stopsFilter" aria-label="依轉機次數篩選">
+                            <option value="">任何轉機次數</option>
+                            <option value="0">僅直飛</option>
+                            <option value="1">最多 1 次轉機</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
+            </section>
 
             <!-- 去程航班列表 -->
-            <h4 class="text-light mb-3">去程航班</h4>
-            <div id="outboundList">
-                <?php foreach ($outboundFlights as $index => $offer) {
-                    $isCheapest = ((float)($offer['price']['total'] ?? INF) === $outMinPrice);
-                    $isFastest = (durationToMinutes($offer['itineraries'][0]['duration'] ?? INF) === $outMinDuration);
-                    // 為每個報價引入可重複使用的航班卡片模板。
-                    include 'templates/flight_card.php';
-                } ?>
-            </div>
-            <?php if (count($outboundFlights) > 10): ?><div class="text-center mt-2"><button class="btn btn-outline-secondary" id="moreOutbound">顯示更多</button></div><?php endif; ?>
-
-            <!-- 回程航班列表 (如果適用) -->
-            <?php if (!empty($returnFlights)): ?>
-                <h4 class="text-light mt-5 mb-3">回程航班</h4>
-                <div id="returnList">
-                    <?php foreach ($returnFlights as $index => $offer) {
-                        $isCheapest = ((float)($offer['price']['total'] ?? INF) === $inMinPrice);
-                        $isFastest = (durationToMinutes($offer['itineraries'][0]['duration'] ?? INF) === $inMinDuration);
+            <section class="flight-section outbound-section" aria-labelledby="outboundTitle">
+                <h3 class="section-title mb-3" id="outboundTitle">
+                    <i class="bi bi-airplane-engines me-2 text-primary" aria-hidden="true"></i>去程航班
+                </h3>
+                <div id="outboundList">
+                    <?php foreach ($outboundFlights as $index => $offer) {
+                        $isCheapest = ((float)($offer['price']['total'] ?? INF) === $outMinPrice);
+                        $isFastest = (durationToMinutes($offer['itineraries'][0]['duration'] ?? INF) === $outMinDuration);
+                        // 為每個報價引入可重複使用的航班卡片模板。
                         include 'templates/flight_card.php';
                     } ?>
                 </div>
-                <?php if (count($returnFlights) > 10): ?><div class="text-center mt-2"><button class="btn btn-outline-secondary" id="moreReturn">顯示更多</button></div><?php endif; ?>
+                <?php if (count($outboundFlights) > 10): ?><div class="text-center mt-3"><button class="btn btn-outline-secondary show-more-btn" id="moreOutbound">顯示更多去程航班</button></div><?php endif; ?>
+            </section>
+
+            <!-- 回程航班列表 (如果適用) -->
+            <?php if (!empty($returnFlights)): ?>
+                <section class="flight-section return-section" aria-labelledby="returnTitle">
+                    <h3 class="section-title mt-5 mb-3" id="returnTitle">
+                        <i class="bi bi-airplane-engines me-2 text-primary route-return-icon" aria-hidden="true"></i>回程航班
+                    </h3>
+                    <div id="returnList">
+                        <?php foreach ($returnFlights as $index => $offer) {
+                            $isCheapest = ((float)($offer['price']['total'] ?? INF) === $inMinPrice);
+                            $isFastest = (durationToMinutes($offer['itineraries'][0]['duration'] ?? INF) === $inMinDuration);
+                            include 'templates/flight_card.php';
+                        } ?>
+                    </div>
+                    <?php if (count($returnFlights) > 10): ?><div class="text-center mt-3"><button class="btn btn-outline-secondary show-more-btn" id="moreReturn">顯示更多回程航班</button></div><?php endif; ?>
+                </section>
             <?php endif; ?>
 
         <?php elseif (!empty($validationErrors)): ?>
-            <div class="alert alert-warning mt-4">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i><b>輸入資料有誤</b>
-                <ul class="mb-0 mt-2">
+            <div class="alert alert-warning mt-4 p-4" role="alert">
+                <div class="d-flex align-items-center mb-2">
+                    <i class="bi bi-exclamation-triangle-fill fs-4 me-2 text-warning" aria-hidden="true"></i>
+                    <h4 class="alert-heading mb-0 fs-5 fw-bold">輸入資料有誤</h4>
+                </div>
+                <ul class="mb-3 mt-2 ps-3">
                     <?php foreach ($validationErrors as $msg): ?>
                         <li><?= htmlspecialchars($msg) ?></li>
                     <?php endforeach; ?>
                 </ul>
+                <a href="index.php" class="btn btn-primary btn-sm"><i class="bi bi-arrow-left me-1"></i> 返回修改搜尋條件</a>
             </div>
         <?php elseif ($apiError): ?>
             <!-- 顯示 API 錯誤訊息 -->
-            <div class="alert alert-warning mt-4"><i class="bi bi-exclamation-triangle-fill me-2"></i><b>查詢失敗</b><br><?= htmlspecialchars($apiError['error'] ?? '發生未知錯誤') ?></div>
+            <div class="alert alert-danger mt-4 p-4" role="alert">
+                <div class="d-flex align-items-center mb-2">
+                    <i class="bi bi-exclamation-octagon-fill fs-4 me-2 text-danger" aria-hidden="true"></i>
+                    <h4 class="alert-heading mb-0 fs-5 fw-bold">查詢失敗</h4>
+                </div>
+                <p class="mb-3"><?= htmlspecialchars($apiError['error'] ?? '發生未知錯誤') ?></p>
+                <a href="index.php" class="btn btn-primary btn-sm"><i class="bi bi-arrow-left me-1"></i> 返回重新搜尋</a>
+            </div>
         <?php elseif ($hasSearchRequest): ?>
             <!-- 顯示找不到航班的訊息 -->
-            <div class="alert alert-info mt-4"><i class="bi bi-info-circle-fill me-2"></i>找不到符合條件的航班。請嘗試放寬您的搜尋條件。</div>
+            <div class="alert alert-info mt-4 p-4 text-center" role="alert">
+                <i class="bi bi-info-circle-fill fs-3 text-primary d-block mb-2" aria-hidden="true"></i>
+                <h4 class="alert-heading fs-5 fw-bold">找不到符合條件的航班</h4>
+                <p class="text-muted mb-3">請嘗試放寬您的搜尋條件，例如更換日期或允許轉機。</p>
+                <a href="index.php" class="btn btn-primary btn-sm"><i class="bi bi-arrow-left me-1"></i> 調整搜尋條件</a>
+            </div>
         <?php else: ?>
-            <div class="alert alert-info mt-4"><i class="bi bi-info-circle-fill me-2"></i>請先回到上一頁輸入搜尋條件。</div>
+            <div class="alert alert-info mt-4 p-4 text-center" role="alert">
+                <i class="bi bi-airplane fs-3 text-primary d-block mb-2" aria-hidden="true"></i>
+                <h4 class="alert-heading fs-5 fw-bold">尚未開始搜尋</h4>
+                <p class="text-muted mb-3">請先回到搜尋頁輸入出發地、目的地與日期。</p>
+                <a href="index.php" class="btn btn-primary btn-sm"><i class="bi bi-search me-1"></i> 前往搜尋機票</a>
+            </div>
         <?php endif; ?>
+        </main>
 
     </div>
     <script src="js/results.js" defer></script>
