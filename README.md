@@ -45,8 +45,8 @@ To get this project running on your local machine, follow these steps:
 
 **1. Clone the Repository / 複製專案**
 ```bash
-git clone <repository-url>
-cd <repository-folder>
+git clone https://github.com/BB5566/flight-search.git
+cd flight-search
 ```
 
 **2. Set Up Environment File / 設定環境變數檔案**
@@ -99,7 +99,7 @@ The project is structured to separate concerns, making it easier to maintain and
 專案結構遵循關注點分離原則，使其更易於維護和擴展。
 
 ```
-d:\FLIGHT-SEARCH
+flight-search/
 ├── css/                # CSS 樣式檔案
 │   ├── style.css       # 首頁 (index.php) 的樣式
 │   └── results.css     # 結果頁 (result.php) 的樣式
@@ -116,6 +116,7 @@ d:\FLIGHT-SEARCH
 ├── amadeus_api.php     # Amadeus API 串接的核心類別
 ├── env.php             # 讀取 .env 環境變數的輔助腳本
 ├── index.php           # 首頁 (搜尋表單)
+├── LICENSE             # 授權條款
 ├── result.php          # 搜尋結果頁
 ├── README.md           # 本檔案
 └── utils.php           # 通用的輔助函式 (如格式化日期、貨幣等)
